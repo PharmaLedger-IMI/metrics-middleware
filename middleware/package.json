@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RomSoftIasi/wg-workspace.git"
+    "url": "git+https://github.com/paiusCatalin/metrics-middleware.git"
   },
   "keywords": [
     "middleware",
@@ -19,9 +19,9 @@
   "author": "RomSoftIasi",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/RomSoftIasi/wg-workspace/issues"
+    "url": "https://github.com/paiusCatalin/metrics-middleware/issues"
   },
-  "homepage": "https://github.com/RomSoftIasi/wg-workspace#readme",
+  "homepage": "https://github.com/paiusCatalin/metrics-middleware#readme",
   "dependencies": {
     "prom-client": "^14.0.1"
   }

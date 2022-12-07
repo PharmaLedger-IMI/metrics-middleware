@@ -6,7 +6,7 @@ const register = client.register;
 const methodRegistryCounters = {};
 const domainRegistryCounters = {};
 register.setDefaultLabels({
-    app: "wg-metrics"
+    app: "csc-metrics"
 });
 
 const requestTimerMetric = new client.Histogram({
