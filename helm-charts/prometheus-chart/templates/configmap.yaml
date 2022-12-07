@@ -19,10 +19,10 @@ data:
         params:
           mode: [ "live" ]
         static_configs:
-          - targets: [ "dlt:80" ]
+          - targets: [ "csc:80" ]
 
       - job_name: "static-metrics"
         params:
           mode: [ "static" ]
         static_configs:
-          - targets: [ "dlt:80" ]
+          - targets: [ "csc:80" ]

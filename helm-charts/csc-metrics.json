@@ -971,7 +971,7 @@
           "type": "gauge"
         },
         {
-          "description": "Bricking operations count over operations on DLT domain",
+          "description": "Bricking operations count over operations on CSC domain",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1077,13 +1077,13 @@
                 "uid": "PE60866158CA1A677"
               },
               "exemplar": true,
-              "expr": "sum by (operation) (bricking_duration_seconds_count{domain=\"dlt\"}) / 2",
+              "expr": "sum by (operation) (bricking_duration_seconds_count{domain=\"CSC\"}) / 2",
               "interval": "",
               "legendFormat": "{{ operation }}",
               "refId": "A"
             }
           ],
-          "title": "Bricking operations count over operations on DLT domain",
+          "title": "Bricking operations count over operations on CSC domain",
           "type": "gauge"
         },
         {
@@ -1344,7 +1344,7 @@
           "type": "bargauge"
         },
         {
-          "description": "Anchoring requests count over operations on DLT domain",
+          "description": "Anchoring requests count over operations on CSC domain",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1394,7 +1394,7 @@
                 "uid": "PE60866158CA1A677"
               },
               "exemplar": true,
-              "expr": "sum by (operation) (anchoring_duration_seconds_count{domain=\"dlt\"}) / 2",
+              "expr": "sum by (operation) (anchoring_duration_seconds_count{domain=\"CSC\"}) / 2",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -1403,7 +1403,7 @@
               "refId": "A"
             }
           ],
-          "title": "Anchoring requests count over operations on DLT domain",
+          "title": "Anchoring requests count over operations on CSC domain",
           "transformations": [],
           "type": "bargauge"
         },
@@ -2091,7 +2091,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "WG-DLT Metrics Copy",
+  "title": "CSC Metrics",
   "uid": "q1iZV_L7k",
   "version": 4,
   "weekStart": ""

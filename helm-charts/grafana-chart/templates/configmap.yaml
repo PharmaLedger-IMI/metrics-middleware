@@ -14,18 +14,18 @@ data:
         type: prometheus
         access: proxy
         orgId: 1
-        url: http://prometheus.default.svc.cluster.local:9090
+        url: http://prometheus:9090
         basicAuth: false
         isDefault: true
         editable: true
 
   custom.ini: |-
     [server]
-      domain = dlt.weldgalaxy.com
+      domain = csc.nvs.pharmaledger.app
       root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana/
       serve_from_sub_path = true
 
-  dlt-metrics.json: |-
+  csc-metrics.json: |-
     {
       "annotations": {
         "list": [
@@ -999,7 +999,7 @@ data:
               "type": "gauge"
             },
             {
-              "description": "Bricking operations count over operations on DLT domain",
+              "description": "Bricking operations count over operations on CSC domain",
               "fieldConfig": {
                 "defaults": {
                   "color": {
@@ -1105,13 +1105,13 @@ data:
                     "uid": "PE60866158CA1A677"
                   },
                   "exemplar": true,
-                  "expr": "sum by (operation) (bricking_duration_seconds_count{domain=\"dlt\"}) / 2",
+                  "expr": "sum by (operation) (bricking_duration_seconds_count{domain=\"CSC\"}) / 2",
                   "interval": "",
                   "legendFormat": ""{{" operation "}}"",
                   "refId": "A"
                 }
               ],
-              "title": "Bricking operations count over operations on DLT domain",
+              "title": "Bricking operations count over operations on CSC domain",
               "type": "gauge"
             },
             {
@@ -1372,7 +1372,7 @@ data:
               "type": "bargauge"
             },
             {
-              "description": "Anchoring requests count over operations on DLT domain",
+              "description": "Anchoring requests count over operations on CSC domain",
               "fieldConfig": {
                 "defaults": {
                   "color": {
@@ -1422,7 +1422,7 @@ data:
                     "uid": "PE60866158CA1A677"
                   },
                   "exemplar": true,
-                  "expr": "sum by (operation) (anchoring_duration_seconds_count{domain=\"dlt\"}) / 2",
+                  "expr": "sum by (operation) (anchoring_duration_seconds_count{domain=\"CSC\"}) / 2",
                   "format": "time_series",
                   "instant": false,
                   "interval": "",
@@ -1431,7 +1431,7 @@ data:
                   "refId": "A"
                 }
               ],
-              "title": "Anchoring requests count over operations on DLT domain",
+              "title": "Anchoring requests count over operations on CSC domain",
               "transformations": [],
               "type": "bargauge"
             },
@@ -2119,7 +2119,7 @@ data:
       },
       "timepicker": {},
       "timezone": "",
-      "title": "WG-DLT Metrics Copy",
+      "title": "CSC Metrics",
       "uid": "q1iZV_L7k",
       "version": 4,
       "weekStart": ""

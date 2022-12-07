@@ -3,9 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Values.storageVolume.volumeName }}
 spec:
-  storageClassName: "default"
+  storageClassName: "standard"
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: 5Gi
