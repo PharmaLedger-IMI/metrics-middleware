@@ -1,0 +1,2126 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMap.name }}
+  labels:
+    name: {{ .Values.configMap.name }}
+  namespace: {{ .Values.general.defaultNamespace }}
+data:
+  datasources.yml: |-
+    apiVersion: 1
+
+    datasources:
+      - name: prometheusdata
+        type: prometheus
+        access: proxy
+        orgId: 1
+        url: http://prometheus.default.svc.cluster.local:9090
+        basicAuth: false
+        isDefault: true
+        editable: true
+
+  custom.ini: |-
+    [server]
+      domain = dlt.weldgalaxy.com
+      root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana/
+      serve_from_sub_path = true
+
+  dlt-metrics.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 1,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 10,
+          "panels": [
+            {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "percentage",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "orange",
+                        "value": 70
+                      },
+                      {
+                        "color": "red",
+                        "value": 85
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 3,
+                "x": 0,
+                "y": 1
+              },
+              "id": 36,
+              "options": {
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": false
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "group by (instance) (domains_count)",
+                  "interval": "",
+                  "legendFormat": "API-Hub instances",
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (app) (domains_count) / 2",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "Number of domains",
+                  "refId": "B"
+                }
+              ],
+              "title": "API-Hub Info",
+              "type": "gauge"
+            },
+            {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 3,
+                "y": 1
+              },
+              "id": 12,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "histogram_quantile(\r\n    0.01, \r\n    sum by (le) (rate(request_duration_seconds_bucket[30s]))\r\n)",
+                  "interval": "",
+                  "legendFormat": ".01",
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "histogram_quantile(\r\n    0.1, \r\n    sum by (le) (rate(request_duration_seconds_bucket[30s]))\r\n)",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": ".10",
+                  "refId": "B"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "histogram_quantile(\r\n    0.5,\r\n    sum by (le) (rate(request_duration_seconds_bucket[30s]))\r\n)",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": ".50",
+                  "refId": "C"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "histogram_quantile(1, sum by (le) (rate(request_duration_seconds_bucket[30s])))",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "1.0",
+                  "refId": "D"
+                }
+              ],
+              "title": "Requests rate for different response times",
+              "type": "timeseries"
+            },
+            {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 10,
+                "y": 1
+              },
+              "id": 14,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (method) (request_duration_seconds_count)",
+                  "interval": "",
+                  "legendFormat": ""{{" method "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Number of requests by method",
+              "type": "timeseries"
+            },
+            {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 7,
+                "x": 17,
+                "y": 1
+              },
+              "id": 16,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (code) (request_duration_seconds_count)",
+                  "interval": "",
+                  "legendFormat": ""{{" code "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Requests count by status",
+              "type": "timeseries"
+            },
+            {
+              "description": "Request count rate for anchoring operations.\nMetrics displayed for 1m and 5m rates.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 12,
+                "x": 0,
+                "y": 9
+              },
+              "id": 32,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (rate(anchoring_duration_seconds_bucket[1m]))",
+                  "interval": "",
+                  "legendFormat": ""{{" operation "}}" - 1m rate",
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (rate(anchoring_duration_seconds_bucket[5m]))",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": ""{{" operation "}}" - 5m rate",
+                  "refId": "B"
+                }
+              ],
+              "title": "Request count rate for anchoring operations",
+              "type": "timeseries"
+            },
+            {
+              "description": "Request count rate for bricking operations.\nMetrics displayed for 1m and 5m rates.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 12,
+                "x": 12,
+                "y": 9
+              },
+              "id": 34,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (rate(bricking_duration_seconds_sum[1m]))",
+                  "interval": "",
+                  "legendFormat": ""{{" operation "}}" - 1m rate",
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (rate(bricking_duration_seconds_sum[5m]))",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": ""{{" operation "}}" - 5m rate",
+                  "refId": "B"
+                }
+              ],
+              "title": "Request count rate for bricking operations",
+              "type": "timeseries"
+            },
+            {
+              "description": "Request count rate for overall anchoring and bricking operations. \nMetrics displayed for 1m and 5m rates.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 18
+              },
+              "id": 33,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum (rate(anchoring_duration_seconds_count[1m]))",
+                  "interval": "",
+                  "legendFormat": "anchoring operations - 5m rate",
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum (rate(bricking_duration_seconds_count[1m]))",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "bricking operations - 5m rate",
+                  "refId": "B"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum (rate(anchoring_duration_seconds_count[5m]))",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "anchoring operations - 5m rate",
+                  "refId": "C"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum (rate(bricking_duration_seconds_count[5m]))",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "anchoring operations - 5m rate",
+                  "refId": "D"
+                }
+              ],
+              "title": "Request count rate for overall anchoring and bricking operations",
+              "type": "timeseries"
+            }
+          ],
+          "title": "Application metrics",
+          "type": "row"
+        },
+        {
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 8,
+          "panels": [
+            {
+              "description": "Bricking operations count over operations",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "#C15C17",
+                        "value": 500
+                      },
+                      {
+                        "color": "#890F02",
+                        "value": 1000
+                      },
+                      {
+                        "color": "#447EBC",
+                        "value": 2500
+                      },
+                      {
+                        "color": "#CCA300",
+                        "value": 5000
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 10000
+                      },
+                      {
+                        "color": "#6ED0E0",
+                        "value": 15000
+                      },
+                      {
+                        "color": "#EF843C",
+                        "value": 20000
+                      },
+                      {
+                        "color": "#E24D42",
+                        "value": 25000
+                      },
+                      {
+                        "color": "super-light-green",
+                        "value": 30000
+                      },
+                      {
+                        "color": "#1F78C1",
+                        "value": 35000
+                      },
+                      {
+                        "color": "#BA43A9",
+                        "value": 40000
+                      },
+                      {
+                        "color": "#705DA0",
+                        "value": 45000
+                      },
+                      {
+                        "color": "red",
+                        "value": 50000
+                      },
+                      {
+                        "color": "#508642",
+                        "value": 50000
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 0,
+                "y": 2
+              },
+              "id": 20,
+              "options": {
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "text": {
+                  "titleSize": 20,
+                  "valueSize": 30
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (bricking_duration_seconds_count) / 2",
+                  "interval": "",
+                  "legendFormat": ""{{" operation "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Bricking operations count over operations",
+              "type": "gauge"
+            },
+            {
+              "description": "Bricking operations count over operations on DEFAULT domain",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "#C15C17",
+                        "value": 500
+                      },
+                      {
+                        "color": "#890F02",
+                        "value": 1000
+                      },
+                      {
+                        "color": "#447EBC",
+                        "value": 2500
+                      },
+                      {
+                        "color": "#CCA300",
+                        "value": 5000
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 10000
+                      },
+                      {
+                        "color": "#6ED0E0",
+                        "value": 15000
+                      },
+                      {
+                        "color": "#EF843C",
+                        "value": 20000
+                      },
+                      {
+                        "color": "#E24D42",
+                        "value": 25000
+                      },
+                      {
+                        "color": "super-light-green",
+                        "value": 30000
+                      },
+                      {
+                        "color": "#1F78C1",
+                        "value": 35000
+                      },
+                      {
+                        "color": "#BA43A9",
+                        "value": 40000
+                      },
+                      {
+                        "color": "#705DA0",
+                        "value": 45000
+                      },
+                      {
+                        "color": "red",
+                        "value": 50000
+                      },
+                      {
+                        "color": "#508642",
+                        "value": 50000
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 6,
+                "y": 2
+              },
+              "id": 24,
+              "options": {
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "text": {
+                  "titleSize": 20,
+                  "valueSize": 30
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (bricking_duration_seconds_count{domain=\"default\"}) / 2",
+                  "interval": "",
+                  "legendFormat": ""{{" operation "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Bricking operations count over operations on DEFAULT domain",
+              "type": "gauge"
+            },
+            {
+              "description": "Bricking operations count over operations on DLT domain",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "#C15C17",
+                        "value": 500
+                      },
+                      {
+                        "color": "#890F02",
+                        "value": 1000
+                      },
+                      {
+                        "color": "#447EBC",
+                        "value": 2500
+                      },
+                      {
+                        "color": "#CCA300",
+                        "value": 5000
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 10000
+                      },
+                      {
+                        "color": "#6ED0E0",
+                        "value": 15000
+                      },
+                      {
+                        "color": "#EF843C",
+                        "value": 20000
+                      },
+                      {
+                        "color": "#E24D42",
+                        "value": 25000
+                      },
+                      {
+                        "color": "super-light-green",
+                        "value": 30000
+                      },
+                      {
+                        "color": "#1F78C1",
+                        "value": 35000
+                      },
+                      {
+                        "color": "#BA43A9",
+                        "value": 40000
+                      },
+                      {
+                        "color": "#705DA0",
+                        "value": 45000
+                      },
+                      {
+                        "color": "red",
+                        "value": 50000
+                      },
+                      {
+                        "color": "#508642",
+                        "value": 50000
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 12,
+                "y": 2
+              },
+              "id": 26,
+              "options": {
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "text": {
+                  "titleSize": 20,
+                  "valueSize": 30
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (bricking_duration_seconds_count{domain=\"dlt\"}) / 2",
+                  "interval": "",
+                  "legendFormat": ""{{" operation "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Bricking operations count over operations on DLT domain",
+              "type": "gauge"
+            },
+            {
+              "description": "Bricking operations count over operations on VAULT domain",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "#C15C17",
+                        "value": 500
+                      },
+                      {
+                        "color": "#890F02",
+                        "value": 1000
+                      },
+                      {
+                        "color": "#447EBC",
+                        "value": 2500
+                      },
+                      {
+                        "color": "#CCA300",
+                        "value": 5000
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 10000
+                      },
+                      {
+                        "color": "#6ED0E0",
+                        "value": 15000
+                      },
+                      {
+                        "color": "#EF843C",
+                        "value": 20000
+                      },
+                      {
+                        "color": "#E24D42",
+                        "value": 25000
+                      },
+                      {
+                        "color": "super-light-green",
+                        "value": 30000
+                      },
+                      {
+                        "color": "#1F78C1",
+                        "value": 35000
+                      },
+                      {
+                        "color": "#BA43A9",
+                        "value": 40000
+                      },
+                      {
+                        "color": "#705DA0",
+                        "value": 45000
+                      },
+                      {
+                        "color": "red",
+                        "value": 50000
+                      },
+                      {
+                        "color": "#508642",
+                        "value": 50000
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 18,
+                "y": 2
+              },
+              "id": 25,
+              "options": {
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "text": {
+                  "titleSize": 20,
+                  "valueSize": 30
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (bricking_duration_seconds_count{domain=\"vault\"}) / 2",
+                  "interval": "",
+                  "legendFormat": ""{{" operation "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Bricking operations count over operations on VAULT domain",
+              "type": "gauge"
+            }
+          ],
+          "title": "Brick storage metrics",
+          "type": "row"
+        },
+        {
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 2
+          },
+          "id": 6,
+          "panels": [
+            {
+              "description": "Anchoring count over operations ",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 0,
+                "y": 3
+              },
+              "id": 22,
+              "options": {
+                "displayMode": "basic",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": true
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (anchoring_duration_seconds_count) / 2",
+                  "format": "time_series",
+                  "instant": false,
+                  "interval": "",
+                  "intervalFactor": 1,
+                  "legendFormat": ""{{" operation "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Anchoring requests count over operations",
+              "type": "bargauge"
+            },
+            {
+              "description": "Anchoring requests count over operations on DEFAULT domain ",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 6,
+                "y": 3
+              },
+              "id": 21,
+              "options": {
+                "displayMode": "basic",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": true
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (anchoring_duration_seconds_count{domain=\"default\"}) / 2",
+                  "format": "time_series",
+                  "instant": false,
+                  "interval": "",
+                  "intervalFactor": 1,
+                  "legendFormat": ""{{"operation"}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Anchoring requests count over operations on DEFAULT domain ",
+              "transformations": [],
+              "type": "bargauge"
+            },
+            {
+              "description": "Anchoring requests count over operations on DLT domain",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 12,
+                "y": 3
+              },
+              "id": 23,
+              "options": {
+                "displayMode": "basic",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": true
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (anchoring_duration_seconds_count{domain=\"dlt\"}) / 2",
+                  "format": "time_series",
+                  "instant": false,
+                  "interval": "",
+                  "intervalFactor": 1,
+                  "legendFormat": ""{{"operation"}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Anchoring requests count over operations on DLT domain",
+              "transformations": [],
+              "type": "bargauge"
+            },
+            {
+              "description": "Anchoring requests count over operations on VAULT domain",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 18,
+                "y": 3
+              },
+              "id": 18,
+              "options": {
+                "displayMode": "basic",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": true
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "sum by (operation) (anchoring_duration_seconds_count{domain=\"vault\"}) / 2",
+                  "format": "time_series",
+                  "instant": false,
+                  "interval": "",
+                  "intervalFactor": 1,
+                  "legendFormat": ""{{" operation "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Anchoring requests count over operations on VAULT domain",
+              "type": "bargauge"
+            }
+          ],
+          "title": "Anchoring metrics",
+          "type": "row"
+        },
+        {
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 3
+          },
+          "id": 4,
+          "panels": [
+            {
+              "datasource": {
+                "type": "datasource",
+                "uid": "-- Mixed --"
+              },
+              "description": "Total user CPU time spent in seconds.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "line"
+                    }
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "s"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 8,
+                "x": 0,
+                "y": 4
+              },
+              "id": 27,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "rate(process_cpu_user_seconds_total[1m])",
+                  "interval": "",
+                  "legendFormat": ""{{" job "}}" - 1m rate",
+                  "refId": "A"
+                }
+              ],
+              "title": "Total user CPU time spent in seconds.",
+              "transformations": [],
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "datasource",
+                "uid": "-- Mixed --"
+              },
+              "description": "Total system CPU time spent in seconds.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 8,
+                "x": 8,
+                "y": 4
+              },
+              "id": 28,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "rate(process_cpu_system_seconds_total[1m])",
+                  "interval": "",
+                  "legendFormat": ""{{" job "}}" - 1m rate",
+                  "refId": "A"
+                }
+              ],
+              "title": "Total system CPU time spent in seconds.",
+              "transformations": [],
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "datasource",
+                "uid": "-- Mixed --"
+              },
+              "description": "Total user and system CPU time spent in seconds.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "line"
+                    }
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "s"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 8,
+                "x": 16,
+                "y": 4
+              },
+              "id": 29,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "rate(process_cpu_seconds_total[1m])",
+                  "interval": "",
+                  "legendFormat": ""{{" job "}}" - 1m rate",
+                  "refId": "A"
+                }
+              ],
+              "title": "Total user and system CPU time spent in seconds.",
+              "transformations": [],
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "datasource",
+                "uid": "-- Mixed --"
+              },
+              "description": "Process resident memory size in bytes.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "line"
+                    }
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "bytes"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 8,
+                "x": 0,
+                "y": 13
+              },
+              "id": 2,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "process_resident_memory_bytes",
+                  "interval": "",
+                  "legendFormat": ""{{" job "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Process resident memory size in bytes.",
+              "transformations": [],
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "datasource",
+                "uid": "-- Mixed --"
+              },
+              "description": "Lag of event loop in seconds.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "line"
+                    }
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "s"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 8,
+                "x": 8,
+                "y": 13
+              },
+              "id": 30,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "nodejs_eventloop_lag_seconds",
+                  "interval": "",
+                  "legendFormat": ""{{" job "}}"",
+                  "refId": "A"
+                }
+              ],
+              "title": "Lag of event loop in seconds.",
+              "transformations": [],
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "datasource",
+                "uid": "-- Mixed --"
+              },
+              "description": "[0.5 / 1m] Garbage collection duration by kind, one of major, minor, incremental or weakcb.\nQuantile on 0.5s for 1m rate",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "line"
+                    }
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "s"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 9,
+                "w": 8,
+                "x": 16,
+                "y": 13
+              },
+              "id": 31,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "pluginVersion": "8.4.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "histogram_quantile(\r\n    0.5, \r\n    sum by (le) (rate(nodejs_gc_duration_seconds_bucket{kind=\"incremental\"}[1m]))\r\n)",
+                  "interval": "",
+                  "legendFormat": "le = 0.5 / 1m | incremental",
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "histogram_quantile(\r\n    0.5, \r\n    sum by (le) (rate(nodejs_gc_duration_seconds_bucket{kind=\"major\"}[1m]))\r\n)",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "le = 0.5 / 1m | major",
+                  "refId": "B"
+                },
+                {
+                  "datasource": {
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "histogram_quantile(\r\n    0.5, \r\n    sum by (le) (rate(nodejs_gc_duration_seconds_bucket{kind=\"weakcb\"}[1m]))\r\n)",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "le = 0.5 / 1m | weakcb",
+                  "refId": "C"
+                },
+                {
+                  "datasource": {
+                    "uid": "PE60866158CA1A677"
+                  },
+                  "exemplar": true,
+                  "expr": "histogram_quantile(\r\n    0.5, \r\n    sum by (le) (rate(nodejs_gc_duration_seconds_bucket{kind=\"minor\"}[1m]))\r\n)",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "le = 0.5 / 1m | minor",
+                  "refId": "D"
+                }
+              ],
+              "title": "[0.5 / 1m] Garbage collection duration by kind, one of major, minor, incremental or weakcb.",
+              "transformations": [],
+              "type": "timeseries"
+            }
+          ],
+          "title": "General metrics",
+          "type": "row"
+        }
+      ],
+      "refresh": "30s",
+      "schemaVersion": 35,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "WG-DLT Metrics Copy",
+      "uid": "q1iZV_L7k",
+      "version": 4,
+      "weekStart": ""
+    }

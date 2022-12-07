@@ -1,0 +1,19 @@
+general:
+  name: prometheus
+  httpPort: 9090
+  defaultNamespace: default
+
+deployment:
+  replicaSet: 1
+  imageName: prom/prometheus
+  imagePullPolicy: IfNotPresent
+
+configMap:
+  name: prometheus-configuration
+  volumeName: prometheus-config-volume
+  mountPath: /etc/prometheus/prometheus.yml
+  subPath: prometheus.yml
+
+storageVolume:
+  volumeName: prometheus-storage-volume
+  mountPath: /prometheus/

@@ -1,0 +1,28 @@
+{
+  "name": "metrics-middleware",
+  "version": "1.0.0",
+  "description": "middleware for metrics",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RomSoftIasi/wg-workspace.git"
+  },
+  "keywords": [
+    "middleware",
+    "metrics",
+    "prometheus",
+    "grafana"
+  ],
+  "author": "RomSoftIasi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RomSoftIasi/wg-workspace/issues"
+  },
+  "homepage": "https://github.com/RomSoftIasi/wg-workspace#readme",
+  "dependencies": {
+    "prom-client": "^14.0.1"
+  }
+}
