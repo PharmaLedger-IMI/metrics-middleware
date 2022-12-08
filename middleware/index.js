@@ -1,4 +1,4 @@
-const fs = require("fs");
+const process = require("process");
 const path = require("path");
 const client = require("prom-client");
 const register = client.register;
@@ -39,8 +39,7 @@ async function metricsHandler(req, res) {
 
 function MetricsMiddleware(server) {
     console.log("[MetricsMiddleware] Initiated!");
-    domainsPath = path.join(__dirname, server.config.storage, "external-volume", "domains");
-
+    domainsPath = path.join(process.cwd(), server.config.storage, "external-volume", "domains");
     server.use(generalMetrics.handleRequestsForMetrics);
     server.use(`/metrics`, responseModifierMiddleware);
     server.use(`/metrics`, requestBodyJSONMiddleware);
