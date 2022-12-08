@@ -94,6 +94,7 @@ function _updateStaticMetricCounts(staticMetrics) {
     counterDomains.set(staticMetrics.domainsCount);
     staticMetrics.domains.forEach(domain => {
         if (!domainRegistryCounters[domain]) {
+            console.log("^^^DOMAIN NAME-",domain,"-END");
             const anchorsCounter = new client.Gauge({
                 name: `domain_${domain}_anchors_count`, help: `Gauge for anchors on ${domain} domain`
             });
