@@ -1,7 +1,7 @@
 const client = require("prom-client");
 const fs = require("fs");
 const path = require("path");
-const {removeDuplicates} = require("../utils");
+const {removeDuplicates,safeMetricName} = require("../utils");
 const register = client.register;
 const methodRegistryCounters = {};
 const domainRegistryCounters = {};
@@ -94,12 +94,11 @@ function _updateStaticMetricCounts(staticMetrics) {
     counterDomains.set(staticMetrics.domainsCount);
     staticMetrics.domains.forEach(domain => {
         if (!domainRegistryCounters[domain]) {
-            console.log("^^^DOMAIN NAME-",domain,"-END");
             const anchorsCounter = new client.Gauge({
-                name: `domain_${domain}_anchors_count`, help: `Gauge for anchors on ${domain} domain`
+                name: safeMetricName(`domain_${domain}_anchors_count`), help: `Gauge for anchors on ${domain} domain`
             });
             const bricksCounter = new client.Gauge({
-                name: `domain_${domain}_bricks_count`, help: `Gauge for bricks on ${domain} domain`
+                name: safeMetricName(`domain_${domain}_bricks_count`), help: `Gauge for bricks on ${domain} domain`
             });
 
             domainRegistryCounters[domain] = {
