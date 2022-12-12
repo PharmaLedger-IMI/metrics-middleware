@@ -5,7 +5,7 @@ const brickingRequestsMetric = new client.Histogram({
     name: "bricking_duration_seconds",
     help: "Bricking requests metrics",
     labelNames: ["action", "code", "domain", "method", "operation", "responseTime"],
-    buckets: [0.5, 0.95, 0.99, 3, 5] // 0.1 to 5 seconds
+    buckets: [0.1, 0.5, 0.95, 0.99, 3, 5] // 0.1 to 5 seconds
 });
 
 register.registerMetric(brickingRequestsMetric);

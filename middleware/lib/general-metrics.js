@@ -1,7 +1,7 @@
 const client = require("prom-client");
 const fs = require("fs");
 const path = require("path");
-const {removeDuplicates,safeMetricName} = require("../utils");
+const {safeMetricName} = require("../utils");
 const register = client.register;
 const methodRegistryCounters = {};
 const domainRegistryCounters = {};
@@ -13,7 +13,7 @@ const requestTimerMetric = new client.Histogram({
     name: "request_duration_seconds",
     help: "Duration of HTTP requests in seconds",
     labelNames: ["action", "code", "domain", "method", "operation"],
-    buckets: [0.5, 0.95, 0.99, 3, 5] // 0.1 to 5 seconds
+    buckets: [0.1, 0.5, 0.95, 0.99, 3, 5] // 0.1 to 5 seconds
 });
 
 register.registerMetric(requestTimerMetric);
@@ -26,13 +26,16 @@ register.registerMetric(counterDomains);
 
 function handleRequestsForMetrics(request, response, next) {
     const {method, url} = request;
-    /** Update the request method counter metric */
-    _requestMethodCounter(method);
+    /** If the request comes from Prometheus, don't count it */
+    if(url === "/metrics" || url.includes("/metrics")) {
+        return next();
+    }
 
+    _requestMethodCounter(method);
     const end = requestTimerMetric.startTimer();
     response.on("finish", () => {
         const urlParts = url.split("/");
-        let action = url, domain = "default", operation = "generic-request";
+        let action = url, domain = "", operation = "generic-request";
         if (urlParts.length >= 4) {
             action = urlParts[1];
             domain = urlParts[2];
@@ -45,26 +48,30 @@ function handleRequestsForMetrics(request, response, next) {
     next();
 }
 
-function getStaticMetrics(rootFolder, currentStaticMetrics) {
-    const domains = fs.readdirSync(rootFolder);
-    let result = JSON.parse(JSON.stringify(currentStaticMetrics));
-    result.domainsCount = domains.length;
-    result.domains = removeDuplicates(domains, currentStaticMetrics.domains);
+function updateMetrics(rootFolder) {
+    let domains = fs.readdirSync(rootFolder);
+    counterDomains.set(domains.length);
     domains.forEach(domain => {
-        if (!result[domain]) {
-            result[domain] = {anchorsCount: 0, bricksCount: 0};
+        const {anchorsCount, bricksCount} = _countContentForDomain(path.join(rootFolder, domain));
+        if (!domainRegistryCounters[domain]) {
+            const anchorsCounter = new client.Gauge({
+                name: safeMetricName(`domain_${domain}_anchors_count`), help: `Gauge for anchors on ${domain} domain`
+            });
+            const bricksCounter = new client.Gauge({
+                name: safeMetricName(`domain_${domain}_bricks_count`), help: `Gauge for bricks on ${domain} domain`
+            });
+
+            domainRegistryCounters[domain] = {
+                anchorsCounter: anchorsCounter, bricksCounter: bricksCounter
+            };
         }
 
-        result[domain] = _countContentForDomain(path.join(rootFolder, domain));
+        domainRegistryCounters[domain].anchorsCounter.set(anchorsCount);
+        domainRegistryCounters[domain].bricksCounter.set(bricksCount);
     });
 
     _updateStaticMetricCounts(result);
     return result;
-}
-
-async function sendLiveMetrics(req, res) {
-    res.setHeader("Content-Type", register.contentType);
-    res.send(200, await register.metrics());
 }
 
 function _countAnchors(srcPath) {
@@ -90,27 +97,6 @@ function _countContentForDomain(srcPath) {
     return {anchorsCount, bricksCount};
 }
 
-function _updateStaticMetricCounts(staticMetrics) {
-    counterDomains.set(staticMetrics.domainsCount);
-    staticMetrics.domains.forEach(domain => {
-        if (!domainRegistryCounters[domain]) {
-            const anchorsCounter = new client.Gauge({
-                name: safeMetricName(`domain_${domain}_anchors_count`), help: `Gauge for anchors on ${domain} domain`
-            });
-            const bricksCounter = new client.Gauge({
-                name: safeMetricName(`domain_${domain}_bricks_count`), help: `Gauge for bricks on ${domain} domain`
-            });
-
-            domainRegistryCounters[domain] = {
-                anchorsCounter: anchorsCounter, bricksCounter: bricksCounter
-            };
-        }
-
-        domainRegistryCounters[domain].anchorsCounter.set(staticMetrics[domain].anchorsCount);
-        domainRegistryCounters[domain].bricksCounter.set(staticMetrics[domain].bricksCount);
-    });
-}
-
 function _requestMethodCounter(method) {
     if (!methodRegistryCounters[method]) {
         const counterMetric = new client.Counter({
@@ -125,5 +111,5 @@ function _requestMethodCounter(method) {
 }
 
 module.exports = {
-    getStaticMetrics, sendLiveMetrics, handleRequestsForMetrics
+    updateMetrics, handleRequestsForMetrics
 };
