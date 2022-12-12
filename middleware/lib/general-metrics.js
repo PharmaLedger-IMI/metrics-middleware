@@ -70,7 +70,6 @@ function updateMetrics(rootFolder) {
         domainRegistryCounters[domain].bricksCounter.set(bricksCount);
     });
 
-    _updateStaticMetricCounts(result);
     return result;
 }
 
