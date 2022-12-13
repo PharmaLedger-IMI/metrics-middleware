@@ -69,8 +69,6 @@ function updateMetrics(rootFolder) {
         domainRegistryCounters[domain].anchorsCounter.set(anchorsCount);
         domainRegistryCounters[domain].bricksCounter.set(bricksCount);
     });
-
-    return result;
 }
 
 function _countAnchors(srcPath) {

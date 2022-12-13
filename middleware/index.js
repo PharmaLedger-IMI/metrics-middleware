@@ -15,6 +15,7 @@ async function metricsHandler(req, res) {
         res.setHeader("Content-Type", register.contentType);
         res.send(200, await register.metrics());
     } catch(e) {
+        console.error(e);
         res.send(500);
     }
 }
