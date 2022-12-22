@@ -1,4 +1,5 @@
 const client = require("prom-client");
+const { getRequestDuration } = require('../utils');
 const register = client.register;
 
 const brickingRequestsMetric = new client.Histogram({
@@ -17,10 +18,12 @@ function brickingMetricsHandler(request, response, next) {
         return null;
     }
 
+    const start = process.hrtime();
     const action = urlSegments[1], domain = urlSegments[2], operation = urlSegments[3];
     const end = brickingRequestsMetric.startTimer();
     response.on("finish", () => {
-        end({action, code: response.statusCode, domain, method, operation});
+        const responseTime = getRequestDuration(start); // in milliseconds
+        end({action, code: response.statusCode, domain, method, operation, responseTime});
     });
 
     next();

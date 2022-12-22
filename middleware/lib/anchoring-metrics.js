@@ -1,4 +1,5 @@
 const client = require("prom-client");
+const { getRequestDuration } = require('../utils');
 const register = client.register;
 
 const anchoringRequestsMetric = new client.Histogram({
@@ -17,10 +18,12 @@ function anchoringMetricsHandler(request, response, next) {
         return null;
     }
 
+    const start = process.hrtime();
     const action = urlSegments[1], domain = urlSegments[2], operation = urlSegments[3];
     const end = anchoringRequestsMetric.startTimer();
     response.on("finish", () => {
-        end({action, code: response.statusCode, domain, method, operation});
+        const responseTime = getRequestDuration(start); // in milliseconds
+        end({action, code: response.statusCode, domain, method, operation, responseTime});
     });
 
     next();

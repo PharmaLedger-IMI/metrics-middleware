@@ -9,7 +9,13 @@ function safeMetricName(metricName) {
 
 }
 
+function getRequestDuration(start) {
+    const diff = process.hrtime(start);
+    return (diff[0] * 1e9 + diff[1]) / 1e6;
+}
+
 module.exports = {
     middlewares,
-    safeMetricName
+    safeMetricName,
+    getRequestDuration
 };
